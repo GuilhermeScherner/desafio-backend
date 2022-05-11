@@ -1,5 +1,3 @@
-import math
-
 import pandas as pd
 
 from src.services.base import BaseService
@@ -36,6 +34,10 @@ class SuggestionService(BaseService):
                 ),
             )
             for suggestion in cities_filtered.iterrows()
+            if ScoreService.score_calculate_normalized(
+                suggestion_request, suggestion[1]["nome"], suggestion[1]["latitude"], suggestion[1]["longitude"]
+            )
+            > 0.01
         ]
 
         suggestions_sorted = sorted(suggestions, key=lambda x: x.score, reverse=True)[:30]
