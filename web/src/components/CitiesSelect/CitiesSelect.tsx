@@ -21,7 +21,7 @@ export const CitiesSelect = () => {
     (state) => state.suggestion.list
   );
   const asyncRequest = debounce((event) => {
-    if (localization && geolocationState.geolocation.latitude)
+    if (localization && geolocationState.geolocation.latitude) {
       dispatch(
         suggestionListThunk({
           q: event.target.value,
@@ -29,6 +29,13 @@ export const CitiesSelect = () => {
           lon: geolocationState.geolocation.longitude,
         })
       );
+    } else {
+      dispatch(
+        suggestionListThunk({
+          q: event.target.value,
+        })
+      );
+    }
   }, 1000);
 
   const handleOnChange = (event: any) => {

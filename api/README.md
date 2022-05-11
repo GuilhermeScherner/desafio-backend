@@ -1,4 +1,4 @@
-# {{cookiecutter.title}}
+# Mooney
 
 
 
@@ -19,4 +19,11 @@ poetry run uvicorn src.main:app --reload --port 8000
 - Access swagger
 ```sh
 http://localhost:8000/docs
+```
+
+### Testes
+
+- Executar testes
+```
+poetry run pytest
 ```

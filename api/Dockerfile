@@ -22,4 +22,3 @@ COPY poetry.lock pyproject.toml ./
 RUN poetry install --no-root --no-dev
 
 COPY ./src ./src/
-COPY ./src/config/prestart.sh ./alembic.ini ./

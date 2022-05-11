@@ -17,28 +17,14 @@ class SuggestionService(BaseService):
         uf_filtered = states[states["codigo_uf"].isin([cod])]
         return uf_filtered["uf"].values[0]
 
-    @staticmethod
-    def cities_filtered_minimum_score(cities: pd.DataFrame, suggestion_request: suggestions_models.SuggestionsRequest):
-        threshold = round(math.sqrt(len(suggestion_request.q)))
-
-        cities_filtered = cities[
-            cities.apply(
-                lambda x: ScoreService.score_calculate(suggestion_request, x["nome"], x["latitude"], x["longitude"])
-                > threshold,
-                axis=1,
-            )
-        ]
-        return cities_filtered
-
     async def suggestion_cities(
         self, suggestion_request: suggestions_models.SuggestionsRequest
     ) -> suggestions_models.SuggestionsResponse:
-        cities = self.suggestion_repository.get_cities_by_name(suggestion_request.q)
+        cities_filtered = self.suggestion_repository.get_cities_by_name(suggestion_request.q)
 
-        if len(cities) == 0:
+        if len(cities_filtered) == 0:
             return suggestions_models.SuggestionsResponse(suggestions=[])
 
-        cities_filtered = SuggestionService.cities_filtered_minimum_score(cities, suggestion_request)
         states = self.suggestion_repository.get_states_by_id(cities_filtered["codigo_uf"])
         suggestions = [
             suggestions_models.Suggestion(
@@ -52,4 +38,6 @@ class SuggestionService(BaseService):
             for suggestion in cities_filtered.iterrows()
         ]
 
-        return suggestions_models.SuggestionsResponse(suggestions=suggestions)
+        suggestions_sorted = sorted(suggestions, key=lambda x: x.score, reverse=True)[:30]
+
+        return suggestions_models.SuggestionsResponse(suggestions=suggestions_sorted)
